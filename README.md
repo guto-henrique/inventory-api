@@ -1,10 +1,12 @@
 # API de Gestão de Inventário
 
-API REST para gerenciamento de categorias, produtos e movimentações de estoque.
+![Tests](https://github.com/guto-henrique/inventory-api/actions/workflows/tests.yml/badge.svg)
+
+API REST para gerenciamento de categorias, produtos e movimentações de estoque, com regras de negócio, migrations versionadas e testes automatizados.
 
 ## Tecnologias
 
-Python, FastAPI, SQLAlchemy, PostgreSQL, Alembic, Pytest e Docker.
+Python, FastAPI, Pydantic, SQLAlchemy, PostgreSQL, Alembic, Pytest e Docker.
 
 ## Executar
 
@@ -12,11 +14,11 @@ Python, FastAPI, SQLAlchemy, PostgreSQL, Alembic, Pytest e Docker.
 
 ```bash
 git clone https://github.com/guto-henrique/inventory-api.git
-
 cd inventory-api
 
-docker compose up --build -d
+cp .env.example .env
 
+docker compose up --build -d
 docker compose exec api alembic upgrade head
 ```
 
@@ -28,44 +30,51 @@ Para carregar dados de exemplo:
 docker compose exec api python -m app.seed
 ```
 
+Para parar a aplicação:
+
+```bash
+docker compose down
+```
+
 ## Documentação
 
-* [Swagger UI](http://localhost:8000/docs)
-* [ReDoc](http://localhost:8000/redoc)
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+<!-- Adicione um print do Swagger em docs/swagger.png e descomente: -->
+<!-- ![Swagger UI](docs/swagger.png) -->
+
+## Endpoints
+
+| Recurso | Operações |
+| --- | --- |
+| Categorias | `POST`, `GET`, `GET/{id}`, `PUT/{id}`, `DELETE/{id}` |
+| Produtos | `POST`, `GET`, `GET/{id}`, `PUT/{id}`, `DELETE/{id}` |
+| Movimentações | `POST`, `GET`, `GET/{id}`, `DELETE/{id}` |
+
+## Regras de negócio
+
+- O estoque não pode ficar negativo.
+- Produtos inativos não recebem movimentações.
+- Categorias com produtos não podem ser excluídas.
+- Produtos usam soft delete.
+- Movimentações não podem ser editadas.
+- A exclusão de uma movimentação reverte o estoque.
 
 ## Testes
 
-Configure o banco de testes no arquivo `.env`:
-
-```env
-TEST_DATABASE_URL=postgresql://admin:admin@localhost:5432/inventario_test
-```
-
-Execute:
+Defina `TEST_DATABASE_URL` no `.env` (veja `.env.example`) e execute:
 
 ```bash
 pytest -v
 ```
 
-## Endpoints
+Os testes também rodam automaticamente no GitHub Actions a cada push.
 
-| Recurso       | Operações                                            |
-| ------------- | ---------------------------------------------------- |
-| Categorias    | `POST`, `GET`, `GET/{id}`, `PUT/{id}`, `DELETE/{id}` |
-| Produtos      | `POST`, `GET`, `GET/{id}`, `PUT/{id}`, `DELETE/{id}` |
-| Movimentações | `POST`, `GET`, `GET/{id}`, `DELETE/{id}`             |
+## Estrutura
 
-## Regras principais
-
-* O estoque não pode ficar negativo.
-* Produtos inativos não recebem movimentações.
-* Categorias com produtos não podem ser excluídas.
-* Produtos utilizam soft delete.
-* Movimentações não podem ser editadas.
-* A exclusão de uma movimentação reverte o estoque.
-
-Para parar a aplicação:
-
-```bash
-docker compose down
+```
+alembic/     migrations do banco
+app/         código da aplicação (models, schemas, routers)
+tests/       testes automatizados
 ```
