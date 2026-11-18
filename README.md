@@ -41,7 +41,7 @@ docker compose down
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 
-![alt text](image.png)
+![Swagger UI](docs/swagger.png)
 
 ## Endpoints
 
@@ -76,4 +76,3 @@ Os testes também rodam automaticamente no GitHub Actions a cada push.
 alembic/     migrations do banco
 app/         código da aplicação (models, schemas, routers)
 tests/       testes automatizados
-```
