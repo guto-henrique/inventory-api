@@ -1,43 +1,48 @@
 # API de Gestão de Inventário
 
-API REST para gerenciamento de categorias, produtos e movimentações de estoque.
+![Tests](https://github.com/guto-henrique/inventory-api/actions/workflows/tests.yml/badge.svg)
+
+API REST para gerenciamento de categorias, produtos e movimentações de estoque, com regras de negócio, migrations versionadas e testes automatizados.
+
 ## Tecnologias
 
-Python, FastAPI, SQLAlchemy, PostgreSQL, Alembic, Pytest e Docker.
+Python, FastAPI, Pydantic, SQLAlchemy, PostgreSQL, Alembic, Pytest e Docker.
 
 ## Executar
 
-Pré-requisitos: Docker, Docker Compose e Python 3.11+.
+**Pré-requisitos:** Docker, Docker Compose e Python 3.11+.
+
 ```bash
 git clone https://github.com/guto-henrique/inventory-api.git
 cd inventory-api
+
+cp .env.example .env
+
 docker compose up --build -d
 docker compose exec api alembic upgrade head
 ```
 
 A API estará disponível em `http://localhost:8000`.
+
 Para carregar dados de exemplo:
 
 ```bash
 docker compose exec api python -m app.seed
 ```
 
-## Documentação
-- Swagger: [localhost:8000/docs](http://localhost:8000/docs)
-- ReDoc: [localhost:8000/redoc](http://localhost:8000/redoc)
-
-## Testes
-
-Configure o banco de testes no arquivo `.env`:
-```env
-TEST_DATABASE_URL=postgresql://admin:admin@localhost:5432/inventario_test
-```
-
-Depois execute:
+Para parar a aplicação:
 
 ```bash
-pytest -v
+docker compose down
 ```
+
+## Documentação
+
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+![alt text](image.png)
+
 ## Endpoints
 
 | Recurso | Operações |
@@ -46,7 +51,7 @@ pytest -v
 | Produtos | `POST`, `GET`, `GET/{id}`, `PUT/{id}`, `DELETE/{id}` |
 | Movimentações | `POST`, `GET`, `GET/{id}`, `DELETE/{id}` |
 
-## Regras principais
+## Regras de negócio
 
 - O estoque não pode ficar negativo.
 - Produtos inativos não recebem movimentações.
@@ -55,8 +60,20 @@ pytest -v
 - Movimentações não podem ser editadas.
 - A exclusão de uma movimentação reverte o estoque.
 
-Para parar a aplicação:
+## Testes
+
+Defina `TEST_DATABASE_URL` no `.env` (veja `.env.example`) e execute:
 
 ```bash
-docker compose down
+pytest -v
+```
+
+Os testes também rodam automaticamente no GitHub Actions a cada push.
+
+## Estrutura
+
+```
+alembic/     migrations do banco
+app/         código da aplicação (models, schemas, routers)
+tests/       testes automatizados
 ```
